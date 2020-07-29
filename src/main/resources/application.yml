@@ -50,3 +50,7 @@ server:
     context-path: /spring_security
 
 domainPage: http://zyy.gdtengnan.com${server.servlet.context-path}
+
+weixin:
+  appId:
+  secret:

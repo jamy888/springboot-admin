@@ -3,6 +3,7 @@ package com.eyoung.springbootadmin.app.service.impl;
 import com.eyoung.springbootadmin.app.service.IWeChatAuthService;
 import com.eyoung.springbootadmin.util.JacksonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -35,8 +36,10 @@ public class WeChatAuthServiceImpl extends DefaultAuthServiceImpl implements IWe
     private static final String USER_INFO_URL =
             "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN";
 
-    private static final String APP_ID="wxb25d600f53151170";
-    private static final String APP_SECRET="b2df7c1dc898c27776cdf628e726afd4";
+    @Value("${weixin.appId}")
+    private String APP_ID;
+    @Value("${weixin.secret}")
+    private String APP_SECRET;
     /**
      * snsapi_userinfo  snsapi_base
      */
