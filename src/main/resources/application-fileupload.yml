@@ -1,0 +1,14 @@
+#文件的基本目录
+basePath: D:\\work\\localhost\\file\\
+imageDomain: http://localhost
+image:
+  #上传的目标相对路径
+  path: upload/image/
+  #图片上传的最大值，必须小于或者等于server.tomcat.max-http-post-size 单位KB
+  maxUploadSize: 3072
+  #压缩图片后的最大值 单位KB
+  maxSize: 800
+  #图片压缩因子，即压缩后的大小/压缩前的大小，建议小于0.9，建议小于0.9
+  accuracy: 0.9
+  #允许上传图片的类型
+  allowTypes: BMP，JPG，JPEG，PNG
