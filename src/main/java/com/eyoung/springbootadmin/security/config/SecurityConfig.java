@@ -37,9 +37,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                        "/login",
                         "/admin-login",
                         "/wechat-login",
-                        "/wechat/polling",
-                        "/wechat/wxLoginPage",
-                        "/wechat/pcAuth",
+                        "/mobile-auth",
+//                        "/wechat/polling",
+//                        "/wechat/wxLoginPage",
+//                        "/wechat/pcAuth",
+                        "/wechat/**",
+                        "/endpointChat",
+                        "/endpointChat/**",
                         "/pages/admin-404",
                         "/pages/admin-500",
                         "/pages/admin-blank",
@@ -49,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/css/**",
                         "/img/**",
                         "/plugins/**",
+                        "/webjars/**",
                         "/pages/include.html"
                 ).permitAll()
                 // 其他非匹配的url均需求授权方可访问
@@ -86,7 +91,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/js/**", "/css/**", "/img/**", "/plugins/**")
+        web.ignoring().antMatchers("/js/**", "/css/**", "/img/**", "/plugins/**","/webjars/**")
         .antMatchers("/*.html","/*.js.map","/**favicon.ico");
     }
 

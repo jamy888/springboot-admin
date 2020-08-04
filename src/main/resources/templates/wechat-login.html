@@ -1,70 +1,559 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <title>微信登录二维码</title>
-<!--    <script src='../plugins/jQuery/jquery-2.2.3.min.js'></script>-->
-<!--    <script src="../plugins/qrcode/qrcode.js"></script>-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=1120px,user-scalable=yes">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta content="no-siteapp" http-equiv="Cache-Control">
+    <title>微信登录</title>
+    <!--<link rel="icon" type="image/png" sizes="16x16"-->
+    <!--href="https://rescdn.qqmail.com/node/wwopen/wwopenmng/style/images/independent/favicon/favicon_16h$e1750fed.png">-->
+    <!--<link rel="icon" type="image/png" sizes="32x32"-->
+    <!--href="https://rescdn.qqmail.com/node/wwopen/wwopenmng/style/images/independent/favicon/favicon_32h$a41a4426.png">-->
+    <!--<link rel="icon" type="image/png" sizes="48x48"-->
+    <!--href="https://rescdn.qqmail.com/node/wwopen/wwopenmng/style/images/independent/favicon/favicon_48h$c976bd14.png">-->
+    <!--[if lte IE 9]>
+    <link rel="stylesheet" type="text/css"
+          href="https://rescdn.qqmail.com/node/wwopen/wwopenmng/style/css/wwopen_developerOfficial.merge.bless1$fb87301f.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://rescdn.qqmail.com/node/wwopen/wwopenmng/style/css/wwopen_developerOfficial.merge.bless2$e4a7b144.css"/>
+    <![endif]-->
+
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="https://rescdn.qqmail.com/node/wwopen/wwopenmng/js/3rd/supportHtml5$0bb27442.js"></script>
+    <![endif]-->
+
     <script th:src="@{/plugins/jQuery/jquery-2.2.3.min.js}"></script>
     <script th:src="@{/plugins/qrcode/qrcode.js}"></script>
-    <script type="text/javascript">
-        var basePath = '[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]';
-        function checkLogin() {
-            var i = 0;
-            var sessionId = $("#sessionId").val();
-            if (sessionId != "") {
-                $.ajax({
-                    url: basePath + "/wechat/polling",
-                    type: "POST",
-                    data: {sessionId: sessionId},
-                    success: function (data) {
-                        if (data.status == "200") {
-                            window.clearInterval(c);
-                            alert(data.message);
-                            location.href = "/";
-                        } else {
-                            i++;
-                            if (i > 60) {
-                                window.clearInterval(c);
-                                alert("二维码已失效！请刷新二维码。");
-                            }
-                        }
-                    }
-                });
-            }
-        }
 
-        function wechatLogin() {
-            $.ajax({
-                url: basePath + "/wechat/wxLoginPage",
-                type: "POST",
-                success: function (data) {
-                    $("#sessionId").val(data.sessionId);
-
-                    var qrcode = new QRCode(document.getElementById("code"), {
-                        width: 200,//设置宽高
-                        height: 200
-                    });
-                    qrcode.makeCode(data.uri);
-                    c = setInterval(checkLogin, 5000);//轮询查询
-                }
-            });
-        }
-
-        /*]]>*/
-    </script>
+<!--    <script th:src="@{/plugins/websocket/sockjs-client/sockjs.min.js}"></script>-->
+<!--    <script th:src="@{/plugins/websocket/stomp-websocket/stomp.min.js}"></script>-->
 </head>
-<body>
-<!--<shiro:guest>-->
-<input type="button" value="微信登录" onclick="wechatLogin()"/>
-<!--</shiro:guest>-->
-<!--<shiro:user>-->
-<!--<shiro:principal property="username"/>-->
-您已登录。
-<!--</shiro:user>-->
+<body class="frame_wrap" style="background-color: rgb(237, 241, 245); padding: 120px 0px 0px;">
+<script>
+    var isWin = (function () {
+        var ua = navigator.userAgent.toLowerCase();
+        var isWin = (ua.indexOf('windows') != -1 || ua.indexOf('win32') != -1) && true;
+        if (isWin) document.body.className += ' isWin';
+        return isWin;
+    })();</script>
+<div id="wwopen.normal_layout_$" rendered="true">
+    <div id="wwopen.normal_layout$layout$">
+        <div id="wwopen.ssoPage_$" rendered="true">
+            <style>html, body {
+                margin: 0;
+            }
 
-<input type="hidden" id="sessionId"/>
-<br/><br/><br/><br/>
-<div id="code"></div>
+            .impowerBox, .impowerBox .status_icon, .impowerBox .status_txt {
+                display: inline-block;
+                vertical-align: middle
+            }
+
+            a {
+                outline: 0
+            }
+
+            h1, h2, h3, h4, h5, h6, p {
+                margin: 0;
+                font-weight: 400
+            }
+
+            a img, fieldset {
+                border: 0
+            }
+
+            body {
+                font-family: "Helvetica Neue", "Arial", "PingFang SC", "Hiragino Sans GB", "STHeiti", "Microsoft YaHei", sans-serif;
+                color: #fff;
+                background: 0 0;
+            }
+
+            .impowerBox {
+                line-height: 1.6;
+                position: relative;
+                width: 100%;
+                z-index: 1;
+                text-align: center;
+            }
+
+            .impowerBox .title {
+                width: 160px;
+                height: 24px;
+                line-height: 24px;
+                /*background: url("//rescdn.qqmail.com/node/wwopen/wwopenmng/style/images/independent/logo/WeworkLogoBule$773753a2.png") no-repeat left top;*/
+                margin: 0 auto;
+                color: #0082EF;
+                font-size: 20px;
+                text-align: left;
+            }
+
+            .logo {
+                width: 29px;
+                height: 24px;
+                vertical-align: top;
+                margin-right: 8px;
+            }
+
+            .impowerBox .qrcode {
+                width: 240px;
+                vertical-align: top;
+            }
+
+            .impowerBox .info {
+                width: 280px;
+                margin: 0 auto
+            }
+
+            .impowerBox .status {
+                text-align: left;
+                color: #737C84;
+                font-size: 0;
+                margin-top: 10px;
+            }
+
+            .impowerBox .status.status_browser {
+                text-align: center;
+                padding: 2px 0;
+            }
+
+            .impowerBox .status p {
+                font-size: 13px
+            }
+
+            .impowerBox .status_txt p {
+                top: -2px;
+                position: relative;
+                margin: 0
+            }
+
+            .impowerBox .icon38_msg {
+                display: inline-block;
+                width: 38px;
+                height: 38px;
+                background-size: 38px 38px;
+                background-position: left top;
+                background-repeat: no-repeat;
+                margin-right: 12px;
+            }
+
+            .impowerBox .icon38_msg.succ {
+                -webkit-animation: scaleBig 0.2s ease-out 0s;
+                -moz-animation: scaleBig 0.2s ease-out 0s;
+                -ms-animation: scaleBig 0.2s ease-out 0s;
+                -o-animation: scaleBig 0.2s ease-out 0s;
+                animation: scaleBig 0.2s ease-out 0s;
+            }
+
+            .status.status_succ .status_txt {
+                -webkit-animation: transformRight 0.2s ease-out 0s;
+                -moz-animation: transformRight 0.2s ease-out 0s;
+                -ms-animation: transformRight 0.2s ease-out 0s;
+                -o-animation: transformRight 0.2s ease-out 0s;
+                animation: transformRight 0.2s ease-out 0s;
+            }
+
+            .status.status_fail {
+                -webkit-animation: transformLeft 0.2s ease-out 0s;
+                -moz-animation: transformLeft 0.2s ease-out 0s;
+                -ms-animation: transformLeft 0.2s ease-out 0s;
+                -o-animation: transformLeft 0.2s ease-out 0s;
+                animation: transformLeft 0.2s ease-out 0s;
+            }
+
+            .impowerBox .status_succ, .impowerBox .status_fail {
+                margin-left: 26px;
+            }
+
+            .impowerBox .status_succ .status_txt h4, .impowerBox .status_fail .status_txt h4 {
+                font-size: 18px;
+                line-height: 25px;
+                margin-bottom: 2px;
+            }
+
+            .impowerBox .status_succ .status_txt p, .impowerBox .status_fail .status_txt p {
+                font-size: 12px;
+                line-height: 17px;
+                color: #A1A7AC;
+            }
+
+            .impowerBox .icon38_msg.succ {
+                background-image: url("//rescdn.qqmail.com/node/wwopen/wwopenmng/style/images/independent/icons/Succ_2x$38dc7620.png");
+            }
+
+            .impowerBox .icon38_msg.warn {
+                background-image: url("//rescdn.qqmail.com/node/wwopen/wwopenmng/style/images/independent/icons/Fail_2x$f2bea9cb.png");
+                border-radius: 50%;
+                background-color: #ffffff;
+            }
+
+            /*.result {*/
+            /*position: absolute;*/
+            /*top: 33%;*/
+            /*left: 26px;*/
+            /*right: 26px;*/
+            /*bottom: 20%;*/
+            /*}*/
+
+            /*.result_iconWrap {*/
+            /*text-align: center;*/
+            /*margin-bottom: 15px;*/
+            /*}*/
+
+            /*.result_icon {*/
+            /*display: inline-block;*/
+            /*width: 50px;*/
+            /*height: 50px;*/
+            /*background: url("//rescdn.qqmail.com/node/wwopen/wwopenmng/style/images/independent/icons/InfoBig_2x$4b9e452f.png") no-repeat left top;*/
+            /*background-size: cover;*/
+            /*}*/
+
+            /*.result_text {*/
+            /*color: #333333;*/
+            /*font-size: 14px;*/
+            /*text-align: center;*/
+            /*max-width: 300px;*/
+            /*margin: auto;*/
+            /*}*/
+
+            .wrp_code {
+                position: relative;
+                margin-top: 6px;
+            }
+
+            .wrp_code_rl_bg {
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: 0;
+                bottom: 0;
+
+            }
+
+            .wrp_code_rl_mask {
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                background: white;
+                opacity: 0.9;
+                filter: alpha(opacity=90)
+            }
+
+            .wrp_code_rl_btn {
+                cursor: pointer;
+                background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#F8F8F8));
+                background-image: -webkit-linear-gradient(top, #fff 0, #F8F8F8 100%);
+                background-image: -o-linear-gradient(top, #fff 0, #F8F8F8 100%);
+                background-image: linear-gradient(to bottom, #fff 0, #F8F8F8 100%);
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#FFFFFFFF", endColorstr="#FFF8F8F8", GradientType=0);
+                border-radius: 2px;
+                vertical-align: middle;
+                border: 1px solid #AAA;
+
+                display: inline-block;
+                margin: 0;
+                -webkit-box-sizing: content-box;
+                box-sizing: content-box;
+                min-width: 24px;
+                height: 24px;
+                padding: 0 12px;
+                background: #F5F5F5;
+                line-height: 24px;
+                outline: 0;
+                text-align: center;
+                font-size: 12px;
+                color: #222;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                text-decoration: none;
+            }
+
+            .wrp_code_rl_info {
+                color: #222;
+                display: inline-block;
+                position: absolute;
+                height: 110px;
+                top: 50%;
+                margin-top: -50px;
+                /*top:80px;*/
+                /*top:0;*/
+                width: 115px;
+                left: 50%;
+                margin-left: -57px;
+            }
+
+            .wrp_code_rl_label {
+                font-size: 14px;
+                padding: 15px 0px;
+            }
+
+            .wrp_code_rl_logo {
+                width: 30px;
+                height: 30px;
+                background: url("//rescdn.qqmail.com/node/wwopen/wwopenmng/style/images/independent/icons/InfoNormal$d162c082.png") no-repeat left top;
+                background-size: 30px 30px;
+            }
+
+            @media screen and (-webkit-min-device-pixel-ratio: 2) {
+                /*.logo {*/
+                /*content: url("//rescdn.qqmail.com/node/wwopen/wwopenmng/style/images/independent/logo/WeworkLogoBule_2x$b12bb1b6.png");*/
+                /*}*/
+
+                .wrp_code_rl_logo {
+                    width: 30px;
+                    height: 30px;
+                    background: url("//rescdn.qqmail.com/node/wwopen/wwopenmng/style/images/independent/icons/InfoNormal_2x$b5bd63aa.png") no-repeat left top;
+                    background-size: 30px 30px;
+                }
+            }
+
+            @media screen and (-webkit-min-device-pixel-ratio: 3) {
+                .impowerBox .icon38_msg.succ {
+                    background-image: url("//rescdn.qqmail.com/node/wwopen/wwopenmng/style/images/independent/icons/Succ_3x$8c66500f.png");
+                }
+
+                .impowerBox .icon38_msg.warn {
+                    background-image: url("//rescdn.qqmail.com/node/wwopen/wwopenmng/style/images/independent/icons/Fail_3x$89d16f97.png");
+                }
+
+                .result_icon {
+                    background-image: url("//rescdn.qqmail.com/node/wwopen/wwopenmng/style/images/independent/icons/InfoBig_3x$0d2189f1.png");
+                }
+            }
+
+            .loginPanel {
+                width: 378px;
+                margin: 0 auto;
+                background: #ffffff;
+                padding: 36px 0 38px;
+                border-radius: 4px;
+                border: 1px solid #E7E9EB;
+                box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.03);
+            }
+
+            @-webkit-keyframes scaleBig {
+                0% {
+                    opacity: 0;
+                    transform: scale(0);
+                }
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes scaleBig {
+                0% {
+                    opacity: 0;
+                    transform: scale(0);
+                }
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            @-webkit-keyframes transformRight {
+                0% {
+                    opacity: 0;
+                    transform: translateX(-15px);
+                }
+                100% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes transformRight {
+                0% {
+                    opacity: 0;
+                    transform: translateX(-15px);
+                }
+                100% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            @-webkit-keyframes transformLeft {
+                0% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes transformLeft {
+                0% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+            </style>
+            <div class="main impowerBox">
+                <div class="loginPanel normalPanel card">
+                    <div class="title">
+                    </div>
+                    <div class="waiting panelContent">
+                        <div class="wrp_code"><div class="qrcode lightBorder" id="qrcode" title="扫码授权" style="margin: 0 auto;" align="center"></div>
+                            <div class="wrp_code_rl_bg" id="wx_timeout_tips" style="display: none">
+                                <div class="wrp_code_rl_mask"></div>
+                                <div class="wrp_code_rl_info">
+                                    <i class="status_icon wrp_code_rl_logo"></i>
+                                    <div class="wrp_code_rl_label">当前二维码已过期</div>
+                                    <a class="wrp_code_rl_btn" href="javascript:window.location.reload()">刷新</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info">
+                            <div class="status status_browser js_status normal" id="wx_default_tip">
+                                <p>请使用微信扫描二维码登录</p>
+                                <p></p>
+                            </div>
+                            <div class="status status_succ js_status normal" style="display:none" id="wx_after_scan">
+                                <i class="status_icon icon38_msg succ"></i>
+                                <div class="status_txt"><h4>扫描成功</h4>
+                                    <p>请在微信中点击确认即可登录</p></div>
+                            </div>
+                            <div class="status status_fail js_status normal" style="display:none" id="wx_after_cancel">
+                                <i class="status_icon icon38_msg warn"></i>
+                                <div class="status_txt">
+                                    <h4>你已取消此次登录</h4>
+                                    <p>你可再次扫描登录，或关闭窗口</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                var i = 0;
+                var sessionId = "";
+                var serverPort = '[[${#httpServletRequest.getServerPort()}]]';
+                if (serverPort === '80'){
+                    serverPort = '';
+                }
+                // var basePath = '[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]';
+                $(function() {
+                    wechatLogin();
+                });
+                function wechatLogin() {
+                    $.ajax({
+                        url: "[[@{/wechat/wxLoginPage}]]",
+                        type: "POST",
+                        success: function (data) {
+                            sessionId = data.sessionId;
+                            var qrcode = new QRCode(document.getElementById("qrcode"), {
+                                width: 200,//设置宽高
+                                height: 200
+                            });
+                            qrcode.makeCode(data.uri);
+                            c = setInterval(checkLogin, 1000);//轮询查询
+                        }
+                    });
+                }
+
+                function checkLogin() {
+
+                    if (sessionId != "" && sessionId != undefined) {
+                        $.ajax({
+                            url: "[[@{/wechat/polling}]]",
+                            type: "POST",
+                            data: {sessionId: sessionId},
+                            success: function (data) {
+                                i++;
+                                if (i > 60) {
+                                    window.clearInterval(c);
+                                    // alert("二维码已失效！请刷新二维码。");
+                                }
+                                if (data.status === 200) {
+                                    // window.clearInterval(c);
+                                    // alert(data.message);
+                                    // location.href = "admin-index";
+                                    if (data.authStatus === "init"){
+                                        console.log("二维码初始完成，等待扫码");
+                                    }
+                                    if (data.authStatus === "scanned"){
+                                        console.log("扫码成功，请在手机上点击确认");
+                                        document.getElementById("wx_default_tip").style.cssText = "display:none";
+                                        document.getElementById("wx_after_scan").style.cssText = "display:display";
+                                        document.getElementById("wx_after_cancel").style.cssText = "display:none";
+                                    }
+                                    if (data.authStatus === "authorized"){
+                                        console.log("授权成功");
+                                        window.clearInterval(c);
+                                        location.href = "admin-login?sessionId=" + sessionId;
+                                        // location.href = "admin-index?sessionId=" + sessionId;
+                                    }
+                                    if (data.authStatus === "cancelled"){
+                                        window.clearInterval(c);
+                                        console.log("取消授权");
+                                        document.getElementById("wx_default_tip").style.cssText = "display:none";
+                                        document.getElementById("wx_after_scan").style.cssText = "display:none";
+                                        document.getElementById("wx_after_cancel").style.cssText = "display:display";
+                                        document.getElementById("wx_timeout_tips").style.cssText = "display:display";
+                                    }
+                                    if (data.authStatus === null){
+                                        console.log("二维码已失效");
+                                        document.getElementById("wx_timeout_tips").style.cssText = "display:display";
+                                        window.clearInterval(c);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            </script>
+
+<!--            <script>-->
+<!--                if (window.addEventListener) {-->
+<!--                    window.addEventListener("message", function (event) {-->
+<!--                        if (event.data == "ask_usePostMessage") {-->
+<!--                            window.settings.crossorgin = true;-->
+<!--                            console.log("use post message redirect ");-->
+<!--                        }-->
+<!--                    });-->
+<!--                }-->
+<!--            </script>-->
+<!--            <script>-->
+<!--                var token = "[[${token}]]"; // 获得当前登录人员的token&ndash;&gt;-->
+<!--                //链接endpoint名称为 "/endpointChat" 的endpoint。-->
+<!--                var sock = new SockJS("/spring_security/endpointChat");-->
+<!--                var stompClient = Stomp.over(sock);-->
+<!--                stompClient.connect({}, function connectCallback (frame) {-->
+
+<!--                    /**  订阅了/user/queue/notifications 发送的消息,这里雨在控制器的 convertAndSendToUser 定义的地址保持一致, -->
+<!--                     *  这里多用了一个/user,并且这个user 是必须的,使用user 才会发送消息到指定的用户。 -->
+<!--                     *  */-->
+<!--                    console.log("token = " + token);-->
+<!--                    console.log('已连接【' + frame + '】');-->
+<!--                    // stompClient.subscribe("/weixin/mp/" + token, handleNotification);-->
+<!--                    stompClient.subscribe("/weixin/mp/" + token, function (greeting) {-->
+<!--                        console.log("message = " + greeting);-->
+<!--                    });-->
+<!--                },function errorCallBack (error) {-->
+<!--                        // 连接失败时（服务器响应 ERROR 帧）的回调方法-->
+<!--                        // document.getElementById("state-info").innerHTML = "连接失败";-->
+<!--                        console.log('连接失败【' + error + '】');-->
+<!--                    }-->
+<!--                );-->
+<!--                function handleNotification(message) {-->
+<!--                    console.log("message = " + message);-->
+<!--                    $('#output').append("<b>Received: " + message.body + "</b><br/>")-->
+<!--                }-->
+
+<!--                function sendSpittle(text) {-->
+<!--                    stompClient.send("/chat", {}, JSON.stringify({ 'name': text }));//3-->
+<!--                }-->
+<!--            </script>-->
+    </div>
+</div>
 </body>
 </html>

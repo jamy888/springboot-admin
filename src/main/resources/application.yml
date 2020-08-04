@@ -18,7 +18,7 @@ spring:
       min-idle: 4
   cache:
     redis:
-      key-prefix: gzgjjApi
+      key-prefix: springboot-admin
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -51,6 +51,13 @@ server:
 
 domainPage: http://zyy.gdtengnan.com${server.servlet.context-path}
 
-weixin:
-  appId:
-  secret:
+wx:
+  mp:
+    appId:
+    secret:
+    token:
+    aesKey:
+    accessTokenShare: false
+    accessTokenUrl:
+    config-storage:
+      type: redis

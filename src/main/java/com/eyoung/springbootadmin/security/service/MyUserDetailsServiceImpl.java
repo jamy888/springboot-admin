@@ -16,7 +16,7 @@ import java.util.List;
  * 配置认证授权组件
  */
 @Service
-public class MyUserDetailsService implements UserDetailsService {
+public class MyUserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private UserMapper userMapper;

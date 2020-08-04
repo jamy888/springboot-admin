@@ -1,10 +1,13 @@
 package com.eyoung.springbootadmin.app.controller;
 
-import com.eyoung.springbootadmin.app.service.impl.WeChatAuthServiceImpl;
-import com.eyoung.springbootadmin.util.JacksonUtil;
+import com.eyoung.springbootadmin.weixin.mp.service.IAuthStatus;
+import com.eyoung.springbootadmin.weixin.mp.service.IWeixinService;
 import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.mp.bean.result.WxMpUser;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -21,8 +24,7 @@ import java.util.Map;
 public class WechatAuthController {
 
     @Autowired
-    private WeChatAuthServiceImpl weChatAuthService;
-
+    private IWeixinService weixinService;
 
     /**
      * pc点击微信登录，生成登录二维码
@@ -37,19 +39,46 @@ public class WechatAuthController {
         String sessionId = request.getSession().getId();
         log.info("sessionId:" + sessionId);
         //设置redirect_uri和state=sessionId以及测试号信息，返回授权url
-        String uri = weChatAuthService.getAuthorizationUrl("pc", sessionId);
+        String uri = weixinService.getAuthorizationUrl("mobile", sessionId);
         log.info(uri);
         Map<String, String> map = new HashMap<String, String>();
         map.put("sessionId", sessionId);
-        map.put("uri", uri);//用来前端生成二维码
+        //用来前端生成二维码
+        map.put("uri", uri);
+
+        weixinService.putSessionStatusToCache(sessionId, IAuthStatus.INIT);
         return map;
     }
 
+//    /**
+//     * 扫描二维码授权成功，取到code，回调方法
+//     *
+//     * @param sessionId
+//     * @param request
+//     * @param response
+//     * @return
+//     * @throws Exception
+//     */
+//    @RequestMapping(value = "/pcAuth")
+//    @ResponseBody
+//    public String pcCallback(String sessionId, HttpServletRequest request, HttpServletResponse response) throws Exception {
+//        log.info("------------授权成功----------------");
+//        WxMpUser wxMpUser = weixinService.getWxMpUser(request, response);
+//        if (wxMpUser != null) {
+//            log.info("-----nickname-----" + wxMpUser.getNickname());
+//            log.info("-----sessionId-----" + sessionId);
+//            weixinService.putSessionStatusToCache(sessionId, IAuthStatus.AUTHORIZED);
+//            return "授权成功";
+////            return "redirect:/auth-success";
+//        }
+//        return "授权失败";
+////        return "redirect:/auth-fail";
+//    }
+
     /**
      * 扫描二维码授权成功，取到code，回调方法
+     *  注意：sessionId参数不能遗漏，否则易出现无法授权的问题
      *
-     * @param code
-     * @param state
      * @param request
      * @param response
      * @return
@@ -57,24 +86,36 @@ public class WechatAuthController {
      */
     @RequestMapping(value = "/pcAuth")
     @ResponseBody
-    public String pcCallback(String code, String state, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        //根据code获取access_token和openId，不懂看微信文档
-        String result = weChatAuthService.getAccessToken(code);
-        Map<String, String> jsonObject = JacksonUtil.readValue(result, HashMap.class);
-        String access_token = jsonObject.get("access_token");
-        String openId = jsonObject.get("openId");
+    public String pcCallback(HttpServletRequest request, HttpServletResponse response){
+        return weixinService.getRedirectUrl(request, "/wechat/auth-result");
+    }
 
-        log.info("------------授权成功----------------");
-        //根据token和openId获取微信用户信息，不懂看我上一篇文章开始分享的链接
-        Map<String, String> infoJson = weChatAuthService.getUserInfo(access_token, openId);
-        if (infoJson != null) {
-            String nickname = infoJson.get("nickName");
-            log.info("-----nickname-----" + nickname);
-            log.info("-----sessionId-----" + state);
-            infoJson.put("openId", openId);
-//            redisTemplate.opsForValue().set(state, infoJson, 10*60, TimeUnit.SECONDS);
-            return "登录成功！";
+    @GetMapping("/auth-result")
+    public String authResult(String code, String sessionId, HttpServletRequest request, HttpServletResponse response) throws Exception  {
+        WxMpUser wxMpUser = weixinService.getWxMpUser(code, sessionId);
+        if (wxMpUser != null){
+            weixinService.putSessionStatusToCache(sessionId, IAuthStatus.AUTHORIZED);
+            return "auth-success";
         }
+
+        return "auth-fail";
+    }
+
+
+    /**
+     * 扫描二维码授权成功，取到code，回调方法
+     *
+     * @param sessionId
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/pcAuthCancelled")
+    @ResponseBody
+    public String pcAuthCancelled(String sessionId, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        log.info("------------授权取消----------------");
+        weixinService.putSessionStatusToCache(sessionId, IAuthStatus.CANCELLED);
         return "登录失败！";
     }
 
@@ -83,52 +124,33 @@ public class WechatAuthController {
     @ResponseBody
     public Map<String, Object> polling(String sessionId, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
-        log.info("进入轮询查询用户是否已登录");
-        resultMap.put("status", 0);
+        log.info("进入轮询查询用户操作");
+        resultMap.put("status", 200);
+        if (StringUtils.isNotBlank(sessionId)){
+            String authStatus = weixinService.getSessionStatusFromCache(sessionId);
+            resultMap.put("authStatus", authStatus);
+            if (StringUtils.isBlank(authStatus)){
+                resultMap.put("message", "二维码已失效");
+                log.info("sessionId : {} 对应的二维码已经失效", sessionId);
+            }
+            if (IAuthStatus.INIT.equalsIgnoreCase(authStatus)){
+                resultMap.put("message", "二维码初始化完成");
+                log.info("sessionId : {} 对应的二维码初始化完成", sessionId);
+            }
+            if (IAuthStatus.SCANNED.equalsIgnoreCase(authStatus)){
+                resultMap.put("message", "扫码成功，请在手机上点击确认");
+                log.info("sessionId : {} 对应的二维码已扫码，请在手机上点击确认", sessionId);
+            }
+            if (IAuthStatus.AUTHORIZED.equalsIgnoreCase(authStatus)){
+
+                resultMap.put("message", "授权成功");
+                log.info("sessionId : {} 对应的二维码已扫码且授权成功", sessionId);
+            }
+            if (IAuthStatus.CANCELLED.equalsIgnoreCase(authStatus)){
+                resultMap.put("message", "取消授权");
+                log.info("sessionId : {} 对应的二维码用户已取消授权", sessionId);
+            }
+        }
         return resultMap;
-//        if(redisTemplate.hasKey(sessionId)){
-//            JSONObject infoJson = (JSONObject)redisTemplate.opsForValue().get(sessionId);
-//            redisTemplate.opsForValue().getOperations().delete(sessionId);
-//            String openId = (String)infoJson.get("openId");
-//            //根据openId判断我们网站是否存在该用户，数据库用户表会保存用户
-//            User user = userService.selectUserByWechat(openId);
-//            if (user == null) {
-//                String nickname = (String)infoJson.get("nickName");
-//                String sex = (String)infoJson.get("sex");
-//                User newuser = new User();
-//                newuser.setSex(sex);
-//                newuser.setWechat(openId);
-//                newuser.setNickname(nickname);
-//                int i = userService.insertUser(newuser);//新增用户
-//                if(i<1){
-//                    resultMap.put("status", 500);
-//                    resultMap.put("message", "登录失败:");
-//                    return resultMap;
-//                }
-//            }
-//            //登录操作
-//            try {
-//                UsernamePasswordToken token = new UsernamePasswordToken(openId, openId);//这里是用shiro登录，反正该openId已经微信扫码验证
-//                SecurityUtils.getSubject().login(token);
-//                resultMap.put("status", 200);
-//                resultMap.put("message", "登录成功");
-//
-//                //更新用户最后登录时间
-//                Subject  currentUser = SecurityUtils.getSubject();
-//                User luser = (User) currentUser.getPrincipal();
-//                User user1 = new User();
-//                user1.setId(luser.getId());
-//                user1.setLastLogDate(new Date());
-//                userService.updateUserByIdSelective(user1);//更新用户方法
-//
-//
-//            } catch (Exception e) {
-//                resultMap.put("message", "未知系统错误:" + e.getMessage());
-//            }
-//            return resultMap;
-//        }else{//not has key
-//            resultMap.put("status", 0);
-//            return resultMap;
-//        }
     }
 }

@@ -1,10 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title></title>
+    <script th:src="@{/plugins/jQuery/jquery-2.2.3.min.js}"></script>
 </head>
 <body>
-$END$
+
 </body>
+
+<script>
+    $(function() {
+        // WeixinJSBridge 微信浏览器内置组件
+        // 这个可以关闭安卓系统的手机
+        document.addEventListener("WeixinJSBridgeReady", function() {
+                WeixinJSBridge.call("closeWindow");
+            },
+            false
+        );
+        //这个可以关闭ios系统的手机
+        WeixinJSBridge.call('closeWindow');
+    });
+</script>
 </html>

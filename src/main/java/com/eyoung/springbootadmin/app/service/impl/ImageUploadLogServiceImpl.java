@@ -20,7 +20,7 @@ import java.util.UUID;
 /**
  * Created with IntelliJ IDEA.
  *
- * @author: zou
+ * @Auth eYoung
  * Date: 2019/11/20
  * Time: 10:37
  * To change this template use File | Settings | File Templates.
@@ -64,8 +64,8 @@ public class ImageUploadLogServiceImpl implements IImageUploadLogService {
     @Value("${imageDomain}")
     private String imageDomain;
 
-    @Autowired
-    private TaskExecutor taskExecutor;
+//    @Autowired
+//    private TaskExecutor taskExecutor;
 
     /**
      * 图片上传
@@ -166,23 +166,23 @@ public class ImageUploadLogServiceImpl implements IImageUploadLogService {
      * @throws Exception
      */
     private void commpressImage(String path, ImageUploadLog imageUploadLog) throws Exception {
-        taskExecutor.execute(() -> {
-            log.info("当前运行的线程名称：" + Thread.currentThread().getName());
-            long start = System.currentTimeMillis();
-            Base64ImageUtil.commpressPicForScale(path, path, maxSize, accuracy);
-            long time = System.currentTimeMillis() - start;
-            log.info("耗时：" + time + "ms");
-
-            File srcFile = new File(path);
-            double srcFilesize = srcFile.length();
-            double size = srcFilesize / 1024;
-            imageUploadLog.setFileName(path);
-            imageUploadLog.setCompressTime((int) time);
-            imageUploadLog.setFileLastSize(size);
-            //保存上传图片调用日志
-            //RQueue<ImageUploadLog> queue = redissonClient.getQueue(getImageUploadLogKey());
-            //queue.add(imageUploadLog);
-        });
+//        taskExecutor.execute(() -> {
+//            log.info("当前运行的线程名称：" + Thread.currentThread().getName());
+//            long start = System.currentTimeMillis();
+//            Base64ImageUtil.commpressPicForScale(path, path, maxSize, accuracy);
+//            long time = System.currentTimeMillis() - start;
+//            log.info("耗时：" + time + "ms");
+//
+//            File srcFile = new File(path);
+//            double srcFilesize = srcFile.length();
+//            double size = srcFilesize / 1024;
+//            imageUploadLog.setFileName(path);
+//            imageUploadLog.setCompressTime((int) time);
+//            imageUploadLog.setFileLastSize(size);
+//            //保存上传图片调用日志
+//            //RQueue<ImageUploadLog> queue = redissonClient.getQueue(getImageUploadLogKey());
+//            //queue.add(imageUploadLog);
+//        });
     }
 
     @Override

@@ -26,6 +26,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created with IntelliJ IDEA.
  *
- * @author: zou
+ * @Auth eYoung
  * Date: 2019/11/17
  * Time: 17:10
  * To change this template use File | Settings | File Templates.
@@ -55,10 +56,6 @@ public class WeixinServiceImpl implements IWeixinService {
     @Autowired
     private WxMpProperties properties;
 
-    private String getAccessTokenKey() {
-        return redis_prefix + ":weixin:accessToken";
-    }
-
     @Override
     public String getRequestURI(HttpServletRequest request) {
         return getRequestURI(request, domainPage);
@@ -74,7 +71,7 @@ public class WeixinServiceImpl implements IWeixinService {
     }
 
     /**
-     * 获取请求地址
+     * 获取当前页面的重定向页面链接
      *
      * @param request
      * @return
@@ -84,9 +81,38 @@ public class WeixinServiceImpl implements IWeixinService {
         String str = request.getScheme() + "://" + request.getServerName()
 //                +":"+request.getServerPort()
                 + request.getContextPath();
-        String redirect_uri = StringUtils.isBlank(domainPage)? str : domainPage;
+        String redirect_uri = StringUtils.isBlank(domainPage) ? str : domainPage;
 //        redirect_uri = str;
         String servletPath = request.getServletPath();
+        List<String> result = Lists.newArrayList();
+        Map<String, ?> params = request.getParameterMap();
+
+        for (String key : params.keySet()) {
+            if (!ArrayUtils.contains(delParams, key)) {
+                result.add(key.trim() + "=" + StringUtils.defaultIfBlank(request.getParameter(key), ""));
+            }
+        }
+        String requestUrl = redirect_uri + servletPath;
+
+        if (!CollectionUtils.isEmpty(result)) {
+            requestUrl += "?" + StringUtils.join(result, "&");
+        }
+        return requestUrl;
+    }
+
+    /**
+     * 获取指定页面的重定向页面链接
+     * @param request
+     * @param servletPath
+     * @param delParams
+     * @return
+     */
+    @Override
+    public String setRequestUrl(HttpServletRequest request, String servletPath, String[] delParams) {
+        String str = request.getScheme() + "://" + request.getServerName()
+//                +":"+request.getServerPort()
+                + request.getContextPath();
+        String redirect_uri = StringUtils.isBlank(domainPage) ? str : domainPage;
         List<String> result = Lists.newArrayList();
         Map<String, ?> params = request.getParameterMap();
 
@@ -145,15 +171,39 @@ public class WeixinServiceImpl implements IWeixinService {
     @Override
     public WxMpUser getWxMpUser(HttpServletRequest request, HttpServletResponse response) {
         String code = request.getParameter("code");
+        String sessionId = request.getParameter("sessionId");
         try {
             if (StringUtils.isBlank(code)) {
                 response.sendRedirect(getMpWxOauth2(getRequestUrl(request), true));
-                return new WxMpUser();
+                return null;
             } else {
                 WxMpOAuth2AccessToken wxMpOAuth2AccessToken = wxMpService.oauth2getAccessToken(code);
                 WxMpUser wxMpUser = wxMpService.oauth2getUserInfo(wxMpOAuth2AccessToken, null);
+                if (wxMpUser != null) {
+                    putWxMpUserToCache(sessionId, wxMpUser);
+                }
                 return wxMpUser;
             }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    @Override
+    public String getRedirectUrl(HttpServletRequest request, String servletPath) {
+        return getMpWxOauth2(setRequestUrl(request, servletPath, null), true);
+    }
+
+    @Override
+    public WxMpUser getWxMpUser(String code, String sessionId) {
+        try {
+            WxMpOAuth2AccessToken wxMpOAuth2AccessToken = wxMpService.oauth2getAccessToken(code);
+            WxMpUser wxMpUser = wxMpService.oauth2getUserInfo(wxMpOAuth2AccessToken, null);
+            if (wxMpUser != null) {
+                putWxMpUserToCache(sessionId, wxMpUser);
+            }
+            return wxMpUser;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -172,9 +222,9 @@ public class WeixinServiceImpl implements IWeixinService {
             log.info("通过共享获取accessToken");
             String accessTokenStr = HttpUtil.get(properties.getAccessTokenUrl());
             String accessToken = accessTokenStr;
-            if(JacksonUtil.isJson(accessTokenStr)){
+            if (JacksonUtil.isJson(accessTokenStr)) {
                 mpAccessToken = JacksonUtil.readValue(accessTokenStr, MpAccessToken.class);
-            }else{
+            } else {
                 mpAccessToken.setAccesstoken(accessToken);
                 mpAccessToken.setExpireSeconds(100 * 120);
             }
@@ -190,20 +240,6 @@ public class WeixinServiceImpl implements IWeixinService {
         return mpAccessToken;
     }
 
-    private void putAccessTokenToCache(String accessToken) throws Exception {
-        RBucket<String> rBucket = redissonClient.getBucket(getAccessTokenKey());
-        rBucket.set(accessToken, 100, TimeUnit.MINUTES);
-    }
-
-    private String getAccessTokenFromCache() throws Exception {
-        RBucket<String> rBucket = redissonClient.getBucket(getAccessTokenKey());
-        String accessTokenStr = rBucket.get();
-        if (StringUtils.isBlank(accessTokenStr)) {
-            return null;
-        }
-        return accessTokenStr;
-    }
-
     @Override
     public WxJsapiSignature createJsapiSignature(String url) throws WxErrorException {
         WxJsapiSignature wxJsapiSignature = wxMpService.createJsapiSignature(url);
@@ -215,8 +251,78 @@ public class WeixinServiceImpl implements IWeixinService {
         return wxMpService.getCallbackIP();
     }
 
-//    @Scheduled(cron = "0/5 * * * * ?")
+    //    @Scheduled(cron = "0/5 * * * * ?")
     public void updateAccessToken() throws Exception {
         getMpAccessToken();
+    }
+
+    @Override
+    public String refreshToken(String refreshToken) throws WxErrorException {
+        WxMpOAuth2AccessToken wxMpOAuth2AccessToken = wxMpService.oauth2refreshAccessToken(refreshToken);
+        //TODO
+        return wxMpOAuth2AccessToken.getAccessToken();
+    }
+
+    /**
+     * pc回调域名
+     */
+    private String pcCallbackUrl = "http://zyy.gdtengnan.com/spring_security/wechat/pcAuth";
+
+    /**
+     * mobile回调域名
+     */
+    private String mobileCallbackUrl = "http://zyy.gdtengnan.com/spring_security/mobile-auth";
+
+    /**
+     * snsapi_userinfo  snsapi_base
+     */
+    private static final String SCOPE = "snsapi_userinfo";
+
+    @Override
+    public String getAuthorizationUrl(String type, String state) throws UnsupportedEncodingException {
+
+        String callbackUrl = "";
+        String urlState = state;
+        //移动端 pc端回调方法不一样
+        if ("pc".equals(type)) {
+            callbackUrl = pcCallbackUrl;
+
+        } else if ("mobile".equals(type)) {
+            callbackUrl = mobileCallbackUrl;
+        }
+        String url = wxMpService.oauth2buildAuthorizationUrl(callbackUrl, SCOPE, urlState);
+        return url;
+    }
+
+    private String getWxMpUserKey(String sessionId) {
+        return redis_prefix + ":weixin:wxmpuser:" + sessionId;
+    }
+
+    private String getSessionStatus(String sessionId) {
+        return redis_prefix + ":authstatus:sessionId:" + sessionId;
+    }
+
+    @Override
+    public void putWxMpUserToCache(String sessionId, WxMpUser wxMpUser) {
+        RBucket<WxMpUser> rBucket = redissonClient.getBucket(getWxMpUserKey(sessionId));
+        rBucket.set(wxMpUser, 1, TimeUnit.HOURS);
+    }
+
+    @Override
+    public WxMpUser getWxMpUserFromCache(String sessionId) {
+        RBucket<WxMpUser> rBucket = redissonClient.getBucket(getWxMpUserKey(sessionId));
+        return rBucket.get();
+    }
+
+    @Override
+    public void putSessionStatusToCache(String sessionId, String status) {
+        RBucket<String> rBucket = redissonClient.getBucket(getSessionStatus(sessionId));
+        rBucket.set(status, 5, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public String getSessionStatusFromCache(String sessionId) {
+        RBucket<String> rBucket = redissonClient.getBucket(getSessionStatus(sessionId));
+        return rBucket.get();
     }
 }

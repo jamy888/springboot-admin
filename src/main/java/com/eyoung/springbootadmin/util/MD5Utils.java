@@ -1,4 +1,4 @@
-package com.tnnet.gdfy.common.util;
+package com.eyoung.springbootadmin.util;
 
 //import lombok.extern.slf4j.Slf4j;
 

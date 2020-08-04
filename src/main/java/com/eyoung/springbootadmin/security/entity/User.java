@@ -1,9 +1,9 @@
 package com.eyoung.springbootadmin.security.entity;
 
-
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 public class User implements UserDetails, Serializable {
@@ -11,6 +11,11 @@ public class User implements UserDetails, Serializable {
     private Long id;
     private String username;
     private String password;
+    private Date accountExpireAt;
+    private Date passwordExpireAt;
+    private String enabled;
+    private String hasLocked;
+    private String openId;
 
     private List<Role> authorities;
 
@@ -49,12 +54,55 @@ public class User implements UserDetails, Serializable {
         this.authorities = authorities;
     }
 
+    public Date getAccountExpireAt() {
+        return accountExpireAt;
+    }
+
+    public void setAccountExpireAt(Date accountExpireAt) {
+        this.accountExpireAt = accountExpireAt;
+    }
+
+    public Date getPasswordExpireAt() {
+        return passwordExpireAt;
+    }
+
+    public void setPasswordExpireAt(Date passwordExpireAt) {
+        this.passwordExpireAt = passwordExpireAt;
+    }
+
+    public String getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(String enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getHasLocked() {
+        return hasLocked;
+    }
+
+    public void setHasLocked(String hasLocked) {
+        this.hasLocked = hasLocked;
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
+    }
+
     /**
      * 用户账号是否过期
      */
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        if (this.accountExpireAt == null){
+            return true;
+        }
+        return System.currentTimeMillis() < this.accountExpireAt.getTime();
     }
 
     /**
@@ -62,7 +110,7 @@ public class User implements UserDetails, Serializable {
      */
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return "0".equalsIgnoreCase(this.hasLocked);
     }
 
     /**
@@ -70,7 +118,10 @@ public class User implements UserDetails, Serializable {
      */
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        if (this.passwordExpireAt == null){
+            return true;
+        }
+        return System.currentTimeMillis() < this.passwordExpireAt.getTime();
     }
 
     /**
@@ -78,7 +129,8 @@ public class User implements UserDetails, Serializable {
      */
     @Override
     public boolean isEnabled() {
-        return true;
+        return "1".equalsIgnoreCase(this.enabled);
+//        return true;
     }
 
 }
