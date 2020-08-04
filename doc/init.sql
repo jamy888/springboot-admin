@@ -4,12 +4,19 @@ DROP TABLE IF EXISTS `user_role`;
 DROP TABLE IF EXISTS `role_permission`;
 DROP TABLE IF EXISTS `permission`;
 
+DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
-`id` bigint(11) NOT NULL AUTO_INCREMENT,
-`username` varchar(255) NOT NULL,
-`password` varchar(255) NOT NULL,
-PRIMARY KEY (`id`)
-);
+  `id` bigint(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `enabled` varchar(1) NOT NULL DEFAULT '0' COMMENT '是否可用',
+  `accountExpireAt` datetime NOT NULL COMMENT '账号到期时间',
+  `passwordExpireAt` datetime NOT NULL COMMENT '用户密码到期时间',
+  `hasLocked` varchar(1) NOT NULL COMMENT '账号是否锁定',
+  `openId` varchar(64) DEFAULT NULL COMMENT '微信openId',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE `role` (
 `id` bigint(11) NOT NULL AUTO_INCREMENT,
 `name` varchar(255) NOT NULL,
@@ -32,8 +39,10 @@ CREATE TABLE `permission` (
 PRIMARY KEY (`id`)
 );
 
-INSERT INTO user (id, username, password) VALUES (1,'user','e10adc3949ba59abbe56e057f20f883e');
-INSERT INTO user (id, username , password) VALUES (2,'admin','e10adc3949ba59abbe56e057f20f883e');
+INSERT INTO user(`id`, `username`, `password`, `enabled`, `account_expire_at`, `password_expire_at`, `has_locked`, `open_id`) VALUES (1, 'user', 'e10adc3949ba59abbe56e057f20f883e', '0', '2020-08-30 11:39:39', '2020-08-30 11:39:48', '0', '0');
+INSERT INTO user(`id`, `username`, `password`, `enabled`, `account_expire_at`, `password_expire_at`, `has_locked`, `open_id`) VALUES (2, 'admin', 'e10adc3949ba59abbe56e057f20f883e', '1', '2020-08-31 11:40:09', '2020-08-31 11:40:15', '0', '123');
+
+
 INSERT INTO role (id, name) VALUES (1,'USER');
 INSERT INTO role (id, name) VALUES (2,'ADMIN');
 INSERT INTO permission (id, url, name, pid) VALUES (1,'/user/common','common',0);
