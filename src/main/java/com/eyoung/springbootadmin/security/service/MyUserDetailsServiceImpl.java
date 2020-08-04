@@ -38,4 +38,18 @@ public class MyUserDetailsService implements UserDetailsService {
     }
 
 
+    public UserDetails loadUserByOpenId(String openId) throws UsernameNotFoundException {
+        //查数据库
+        User user = userMapper.loadUserByOpenId(openId);
+        if (null != user) {
+            List<Role> roles = roleMapper.getRolesByUserId( user.getId() );
+            user.setAuthorities( roles );
+//            UserDetails userDetails = new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), roles);
+        } else {
+            throw new UsernameNotFoundException("不存在该用户!");
+        }
+        return user;
+    }
+
+
 }

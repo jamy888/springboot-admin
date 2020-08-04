@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html style="font-size: 22.5px;" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <title>微信授权</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="layoutmode" content="standard">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="renderer" content="webkit">
+    <meta content="always" name="referrer">
+
+    <meta name="wap-font-scale" content="no">
+    <meta content="telephone=no" name="format-detection">
+    <meta http-equiv="Pragma" content="no-cache">
+    <link rel="stylesheet" type="text/css" href="https://mo.faisys.com/css/base.min.css?v=202007291702" title="default">
+    <link rel="stylesheet" type="text/css" href="https://mo.faisys.com/css/dist/module.min.css?v=202007291702">
+    <link rel="stylesheet" type="text/css" href="https://mo.faisys.com/css/themeV3Default.min.css?v=202007291702">
+    <!-- <link type="text/css" href="https://mos.faisys.com/3/24901943/2052/0/fkModuleSkin.min.css?v=20200415155452"
+          rel="stylesheet"> -->
+    <link rel="stylesheet" type="text/css" th:href="@{/css/mobile/auth.css}">
+    <script th:src="@{/plugins/jQuery/jquery-2.2.3.min.js}"></script>
+
+    <script type="text/javascript">
+        try {
+            var _htmlFontSize = (function () {
+                var clientWidth = document.documentElement ? document.documentElement.clientWidth : document.body.clientWidth;
+                if (clientWidth > 768 && clientWidth < 1280) {
+                    clientWidth = 768;
+                } else if (clientWidth >= 1280) {
+                    clientWidth = 512;
+                }
+                document.documentElement.style.fontSize = clientWidth * 1 / 16 + "px";
+                return clientWidth * 1 / 16;
+            })();
+            window.FAI_HAWK_EYE && (window.FAI_HAWK_EYE.js_err_filter = function () {
+                var event = arguments[4];
+
+                if (event && event.innerError) {
+                    return true;
+                }
+
+                var url = arguments[1];
+
+                if (url && ['mo.faisys.com/js', 'fe.faisys.com'].some(function (item) {
+                    return url.indexOf(item) !== -1;
+                })) {
+                    return true;
+                }
+                ;
+                return false;
+            });
+        } catch (e) {
+            e.innerError = true;
+            throw(e);
+        }
+    </script>
+</head>
+
+<body id="g_body" class="g_locale2052 mobiCol3 jz_themeV3 regularHeadStyle">
+
+<div id="g_web" class="g_web jz_nav-drawer jz_nav-drawer-left">
+
+    <div id="webContainerBox" class="webContainerBox moveAnimation" style="overflow:visible;">
+        <div id="webModuleContainer" class="webModuleContainer">
+            <div id="module312" _height="0" _autowidth="1" _width="0" _inpopupzone="0"
+                 _intab="0" _infold="0" _infloatzone="0" _bheight="0" _headerhiden="" data-server-rendered="true"
+                 class="form Handle module312 formStyle51">
+                <div class="formMiddle formMiddle312">
+                    <!-- <div class="middleLeft middleLeft312"></div> -->
+                    <div class="middleCenter middleCenter312">
+                        <div class="formMiddleContent moduleContent formMiddleContent312">
+                            <div class="J_packModule fk-formPack">
+                                <div id="fk-packContent312" class="J_packContentList f-packContentList">
+                                    <!-- <div class="J_packContentBg f-packContentBg f-packContentBg312"></div> -->
+
+                                    <div id="formPackContent312" class="J_formPackContent f-formPackContent">
+                                        <div id="module328" _height="30"
+                                             _autowidth="0" _width="29" _inpack="312" _inpopupzone="0" _intab="0"
+                                             _infold="0" _infloatzone="0" _bheight="0" _headerhiden="1"
+                                             data-server-rendered="true" class="form Handle module328 formStyle53"
+                                             style="position: absolute; left: 1.9407rem; top: 0.50323rem; width: 1.25067rem; height: 1.2938rem; opacity: 1;">
+                                            <div class="formMiddle formMiddle328">
+                                                <!-- <div class="middleLeft middleLeft328"></div> -->
+                                                <div class="middleCenter middleCenter328">
+                                                    <div class="formMiddleContent moduleContent formMiddleContent328">
+                                                        <div class="fk-floatImgContainer J_floatImgContainer"><a
+                                                                hidefocus="true" href="javascript:void(0);" rel=""
+                                                                class="J_floatImg_jump floatImgALink">
+                                                            <div data-picid="ABUIABAEGAAgr-yN_QUo25CmlwEwsAk4sAk"
+                                                                 class="floatImgWrap J_floatImgWrap"
+                                                                 style="opacity: 1;"><img
+                                                                    src="https://24901943.s21i.faiusr.com/4/ABUIABAEGAAgr-yN_QUo25CmlwEwsAk4sAk!1500x1500.png"
+                                                                    class="J_img_lazyload float_img J_float_img J_photo"
+                                                                    style="width: 1.25067rem; height: 1.2938rem;">
+                                                            </div>
+                                                        </a></div>
+                                                    </div>
+                                                </div>
+                                                <!-- <div class="middleRight middleRight328"></div> -->
+                                            </div>
+                                        </div>
+                                        <div id="module330" _height="0" _autowidth="1"
+                                             _width="0" _inpack="312" _inpopupzone="0" _intab="0" _infold="0"
+                                             _infloatzone="0" _bheight="0" _headerhiden="1" data-server-rendered="true"
+                                             class="form Handle module330 formStyle52"
+                                             style="position: absolute; left: 4.09704rem; top: 0.50323rem; height: auto; width: 7.7628rem;">
+
+                                            <div class="formMiddle formMiddle330">
+                                                <!-- <div class="middleLeft middleLeft330"></div> -->
+                                                <div class="middleCenter middleCenter330">
+                                                    <div class="formMiddleContent moduleContent formMiddleContent330">
+                                                        <div class="fk-editor simpleText fk-editor-break-word"
+                                                             style="height: auto; width: 7.7628rem;">
+                                                            <span style="">
+                                                                <span style="font-size: 0.603774rem; line-height: 0.603774rem;">
+                                                                    XXXX系统申请使用
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- <div class="middleRight middleRight330"></div> -->
+                                            </div>
+                                        </div>
+                                        <div id="module331" _height="0" _autowidth="0"
+                                             _width="281" _inpack="312" _inpopupzone="0" _intab="0" _infold="0"
+                                             _infloatzone="0" _bheight="0" _headerhiden="1" data-server-rendered="true"
+                                             class="form Handle module331 formStyle52"
+                                             style="position: absolute; left: 1.9407rem; top: 3.36523rem; width: 12.1186rem; height: auto;">
+
+                                            <div class="formMiddle formMiddle331">
+                                                <div class="middleCenter middleCenter331">
+                                                    <div class="formMiddleContent moduleContent formMiddleContent331">
+                                                        <div class="fk-editor simpleText fk-editor-break-word  "
+                                                             style="width: 12.1186rem; height: auto;">
+                                                            你的账号信息（昵称、头像、地区及性别)
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- <div class="middleRight middleRight331"></div> -->
+                                            </div>
+                                        </div>
+
+
+                                        <div id="module311" _height="0" _autowidth="1"
+                                             _width="0" _inpack="312" _inpopupzone="0" _intab="0" _infold="0"
+                                             _infloatzone="0" _bheight="0" _headerhiden="1" data-server-rendered="true"
+                                             class="form Handle module311 formStyle54"
+                                             style="position:absolute;left: 3.838274932614555rem;top:15.3544474393531rem;border:10px solid transparent;">
+
+                                            <div class="formMiddle formMiddle311">
+                                                <div class="middleCenter middleCenter311">
+                                                    <div class="formMiddleContent moduleContent formMiddleContent311">
+                                                        <div class="J_floatBtnBox_311 J_floatBtnBox floatBtnBox floatBtnStyle floatBtnStyle0">
+<!--                                                            <a th:href="@{/wechat/pcAuth(sessionId=${sessionId})}" id="agree" onclick="agree();"-->
+<!--                                                               target="_self"-->
+<!--                                                               class="J_floatBtn middle floatBtn m_floatBtnStyle_color g_main_bgColor_v3 g_oldThemeBgColor"-->
+<!--                                                               style="cursor: default;">同意</a>-->
+                                                            <a href="javascript:;" id="agree" onclick="agree();"
+                                                               target="_self"
+                                                               class="J_floatBtn middle floatBtn m_floatBtnStyle_color g_main_bgColor_v3 g_oldThemeBgColor"
+                                                               style="cursor: default;">同意</a>
+<!--                                                            <input type="button" id="agree" onclick="agree();" class="J_floatBtn middle floatBtn m_floatBtnStyle_color g_main_bgColor_v3 g_oldThemeBgColor" value="同意" style="border: 0px;"/>-->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="module313" _height="0" _autowidth="1" _width="0" _inpack="312" _inpopupzone="0" _intab="0" _infold="0" _infloatzone="0" _bheight="0" _headerhiden="1" data-server-rendered="true"
+                                             class="form Handle module313 formStyle54"
+                                             style="position:absolute;left:3.838274932614555rem;top:18.157681940700808rem;border:10px solid transparent;">
+
+                                            <div class="formMiddle formMiddle313">
+                                                <div class="middleCenter middleCenter313">
+                                                    <div class="formMiddleContent moduleContent formMiddleContent313">
+                                                        <div class="J_floatBtnBox_313 J_floatBtnBox floatBtnBox floatBtnStyle floatBtnStyle7">
+                                                            <a href="javascript:;" target="_self" id="disagree" onclick="disagree();"
+                                                               class="J_floatBtn middle floatBtn m_floatBtnStyle_color g_main_color_v3 g_main_bdColor_v3 g_oldThemeBdColor g_oldThemeColor"
+                                                               style="cursor: default;">拒绝</a>
+
+<!--                                                            <input type="button" id="disagree" onclick="disagree();" class="J_floatBtn middle floatBtn m_floatBtnStyle_color g_main_color_v3 g_main_bdColor_v3 g_oldThemeBdColor g_oldThemeColor" value="拒绝" style="border: 0px;background-color: grey;color: white;"/>-->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script >
+    function agree() {
+        // document.getElementById("agree").disabled=true;
+        $('#agree').removeAttr('href');//去掉a标签中的href属性
+        $('#agree').removeAttr('onclick');//去掉a标签中的onclick事件
+        // window.location.href="[[@{/wechat/pcAuth(sessionId=${sessionId})}]]";
+        $.ajax({
+            url: "[[@{/wechat/pcAuth}]]",
+            type: "GET",
+            data:{
+                sessionId: "[[${sessionId}]]"
+            },
+            success: function (data) {
+                // WeixinJSBridge 微信浏览器内置组件
+                // 这个可以关闭安卓系统的手机
+                window.location.href=data;
+            }
+        });
+    }
+
+    function disagree(){
+        // document.getElementById("disagree").disabled=true;
+        $('#disagree').removeAttr('href');//去掉a标签中的href属性
+        $('#disagree').removeAttr('onclick');//去掉a标签中的onclick事件
+        $.ajax({
+            // url: basePath + "/wechat/pcAuthCancelled",
+            url: "[[@{/wechat/pcAuthCancelled}]]",
+            type: "POST",
+            data:{
+                sessionId: "[[${sessionId}]]"
+            },
+            success: function (data) {
+                // WeixinJSBridge 微信浏览器内置组件
+                // 这个可以关闭安卓系统的手机
+                document.addEventListener("WeixinJSBridgeReady", function() {
+                        WeixinJSBridge.call("closeWindow");
+                    },
+                    false
+                );
+                //这个可以关闭ios系统的手机
+                WeixinJSBridge.call('closeWindow');
+            }
+        });
+    }
+</script>
+</body>
+</html>
