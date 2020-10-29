@@ -1,10 +1,9 @@
 package com.eyoung.springbootadmin.security.core;
 
+import com.eyoung.springbootadmin.security.core.login.LoginFactory;
+import com.eyoung.springbootadmin.security.core.login.LoginWay;
 import com.eyoung.springbootadmin.security.entity.User;
-import com.eyoung.springbootadmin.security.service.MyUserDetailsServiceImpl;
-import com.eyoung.springbootadmin.weixin.mp.service.IWeixinService;
-import me.chanjar.weixin.mp.bean.result.WxMpUser;
-import org.apache.commons.lang3.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
@@ -18,54 +17,51 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+@Slf4j
 @Component
 public class LoginValidateAuthenticationProvider implements AuthenticationProvider {
-    @Resource
-    private MyUserDetailsServiceImpl userService;
-    @Autowired
-    private IWeixinService weixinService;
     //解密用的
     @Resource
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private LoginFactory loginFactory;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         UserDetails user = new User();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        // 获取sessionId，理论上该值与request.getParameter("sessionId")获取到的值一致
         String sessionId = request.getSession().getId();
+        String type = request.getParameter("type");
+        String username = (String) authentication.getPrincipal();
         String rawPassword = (String) authentication.getCredentials();
-        if (StringUtils.isNotBlank(sessionId)){
-            WxMpUser wxMpUser = weixinService.getWxMpUserFromCache(sessionId);
-            if (wxMpUser != null){
-                String openId = wxMpUser.getOpenId();
-                user = userService.loadUserByOpenId(openId);
-                rawPassword = user.getPassword();
-            }
-        }else{
-            //获取输入的用户名
-            String username = authentication.getName();
-            //获取输入的明文
-            //查询用户是否存在
-            user = userService.loadUserByUsername(username);
-            //验证密码
-            if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-                throw new BadCredentialsException("输入密码错误!");
-            }
-        }
 
+        LoginWay loginWay = loginFactory.getWay(type);
+        user = loginWay.loadUserByUsername(sessionId, username);
+
+        // 当前端传过来的登录方式为非账户登录，此时 authentication.getPrincipal() 得到的username值为""，因此，需要重新获取
+        username = user.getUsername();
         if (!user.isEnabled()) {
-            throw new DisabledException("该账户已被禁用，请联系管理员");
+            log.error("账户{}已被禁用，请联系管理员", username);
+            throw new DisabledException("账户" + username + "已被禁用，请联系管理员");
 
         } else if (!user.isAccountNonLocked()) {
+            log.error("账户{}已被锁定，请联系管理员", username);
             throw new LockedException("该账号已被锁定");
-
         } else if (!user.isAccountNonExpired()) {
-            throw new AccountExpiredException("该账号已过期，请联系管理员");
+            log.error("账户{}已过期，请联系管理员", username);
+            throw new AccountExpiredException("账户" + username + "已过期，请联系管理员");
 
         } else if (!user.isCredentialsNonExpired()) {
-            throw new CredentialsExpiredException("该账户的登录凭证已过期，请重新登录");
+            log.error("账户{}密码已过期，请联系管理员", username);
+            throw new CredentialsExpiredException("账户" + username + "密码已过期，请重新登录");
         }
-        return new UsernamePasswordAuthenticationToken(user, rawPassword, user.getAuthorities());
+
+        //验证密码
+        else if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new BadCredentialsException("输入密码错误!");
+        }
+        return new UsernamePasswordAuthenticationToken(username, rawPassword, user.getAuthorities());
     }
 
     @Override

@@ -43,7 +43,7 @@
         <div class="login-box-body">
             <p class="login-box-msg">登录系统</p>
 
-            <form th:action="@{/admin-login}" method="post">
+            <form th:action="@{/admin-login?type=Account}" method="post">
                 <div class="form-group has-feedback">
                     <input type="hidden" th:value="${sessionId}" id="sessionId" name="sessionId">
 <!--                    <input type="email" class="form-control" placeholder="Email">-->

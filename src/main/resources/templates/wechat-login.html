@@ -489,7 +489,7 @@
                                     if (data.authStatus === "authorized"){
                                         console.log("授权成功");
                                         window.clearInterval(c);
-                                        location.href = "admin-login?sessionId=" + sessionId;
+                                        location.href = "admin-login?type=WechatMp&sessionId=" + sessionId;
                                         // location.href = "admin-index?sessionId=" + sessionId;
                                     }
                                     if (data.authStatus === "cancelled"){

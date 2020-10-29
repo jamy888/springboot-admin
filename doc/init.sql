@@ -15,7 +15,7 @@ CREATE TABLE `user` (
   `hasLocked` varchar(1) NOT NULL COMMENT '账号是否锁定',
   `openId` varchar(64) DEFAULT NULL COMMENT '微信openId',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `role` (
 `id` bigint(11) NOT NULL AUTO_INCREMENT,
