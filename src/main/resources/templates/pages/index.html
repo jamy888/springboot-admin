@@ -23,5 +23,15 @@
     <footer class="main-footer" th:replace="pages/include::footer"></footer>
 </div>
 <!-- 页面js /-->
+
+<script>
+    $(document).ready(function() {
+        // var content = '<%=request.getAttribute("content")%>';
+        // var content = "[[${content}]]";
+        // console.log(content);
+        // 激活导航位置
+        setSidebarActive("[[${content}]]");
+    });
+</script>
 </body>
 </html>

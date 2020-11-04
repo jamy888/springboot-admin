@@ -25,7 +25,7 @@ public class MyInvocationSecurityMetadataSourceService implements FilterInvocati
     /**
      * 每一个资源所需要的角色 Collection<ConfigAttribute>决策器会用到
      */
-    private static HashMap<String, Collection<ConfigAttribute>> map =null;
+    private static HashMap<String, Collection<ConfigAttribute>> map = null;
 
 
     /**
@@ -35,10 +35,10 @@ public class MyInvocationSecurityMetadataSourceService implements FilterInvocati
     public Collection<ConfigAttribute> getAttributes(Object o) throws IllegalArgumentException {
         //object 中包含用户请求的request 信息
         HttpServletRequest request = ((FilterInvocation) o).getHttpRequest();
-        for (Iterator<String> it = map.keySet().iterator() ; it.hasNext();) {
+        for (Iterator<String> it = map.keySet().iterator(); it.hasNext(); ) {
             String url = it.next();
-            if (new AntPathRequestMatcher( url ).matches( request )) {
-                return map.get( url );
+            if (new AntPathRequestMatcher(url).matches(request)) {
+                return map.get(url);
             }
         }
 
@@ -72,12 +72,12 @@ public class MyInvocationSecurityMetadataSourceService implements FilterInvocati
             String roleName = rolePermisson.getRoleName();
             ConfigAttribute role = new SecurityConfig(roleName);
 
-            if(map.containsKey(url)){
+            if (map.containsKey(url)) {
                 map.get(url).add(role);
-            }else{
-                List<ConfigAttribute> list =  new ArrayList<>();
-                list.add( role );
-                map.put( url , list );
+            } else {
+                List<ConfigAttribute> list = new ArrayList<>();
+                list.add(role);
+                map.put(url, list);
             }
         }
         log.info("完成初始化所有资源对应的角色");

@@ -18,7 +18,6 @@ import java.io.IOException;
 @Component
 public class MyFilterSecurityInterceptor extends AbstractSecurityInterceptor implements Filter {
 
-
     @Autowired
     private FilterInvocationSecurityMetadataSource securityMetadataSource;
 
@@ -27,16 +26,13 @@ public class MyFilterSecurityInterceptor extends AbstractSecurityInterceptor imp
         super.setAccessDecisionManager(myAccessDecisionManager);
     }
 
-
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-
         FilterInvocation fi = new FilterInvocation(servletRequest, servletResponse, filterChain);
         invoke(fi);
     }
 
     public void invoke(FilterInvocation fi) throws IOException, ServletException {
-
         InterceptorStatusToken token = super.beforeInvocation(fi);
         try {
             //执行下一个拦截器
@@ -53,7 +49,6 @@ public class MyFilterSecurityInterceptor extends AbstractSecurityInterceptor imp
 
     @Override
     public SecurityMetadataSource obtainSecurityMetadataSource() {
-
         return this.securityMetadataSource;
     }
 

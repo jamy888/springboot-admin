@@ -433,6 +433,8 @@
                     </div>
                 </div>
             </div>
+            <input type="hidden" th:value="${_csrf.headerName}" id="X-XSRF-TOKEN">
+            <input type="hidden" th:value="${_csrf.token}" id="_csrf">
             <script>
                 var i = 0;
                 var sessionId = "";
@@ -440,6 +442,13 @@
                 if (serverPort === '80'){
                     serverPort = '';
                 }
+                /** var csrfToken = "[[${_csrf.token}]]";
+                // var csrfHeaderName = "[[${_csrf.headerName}]]"; **/
+
+                var csrfToken = $("#_csrf").val();
+                var csrfHeaderName = $("#X-XSRF-TOKEN").val();
+
+
                 // var basePath = '[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]';
                 $(function() {
                     wechatLogin();
@@ -448,6 +457,9 @@
                     $.ajax({
                         url: "[[@{/wechat/wxLoginPage}]]",
                         type: "POST",
+                        beforeSend: function(request) {
+                            request.setRequestHeader(csrfHeaderName, csrfToken);
+                        },
                         success: function (data) {
                             sessionId = data.sessionId;
                             var qrcode = new QRCode(document.getElementById("qrcode"), {
@@ -461,11 +473,13 @@
                 }
 
                 function checkLogin() {
-
                     if (sessionId != "" && sessionId != undefined) {
                         $.ajax({
                             url: "[[@{/wechat/polling}]]",
                             type: "POST",
+                            beforeSend: function(request) {
+                                request.setRequestHeader(csrfHeaderName, csrfToken);
+                            },
                             data: {sessionId: sessionId},
                             success: function (data) {
                                 i++;

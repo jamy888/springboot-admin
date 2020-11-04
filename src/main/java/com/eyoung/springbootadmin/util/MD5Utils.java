@@ -1,6 +1,6 @@
 package com.eyoung.springbootadmin.util;
 
-//import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -13,14 +13,14 @@ import java.security.NoSuchAlgorithmException;
  * @url tnnet.com
  * @date 2017年8月8日 下午5:17:34
  */
-//@Slf4j
+@Slf4j
 public class MD5Utils {
 
 
     public static String strTo16(String sourceStr) {
         String result = strTo32(sourceStr).substring(8, 24);
         //输出16位16进制字符串
-        System.out.println("MD5(" + sourceStr + ",16) = " + result);
+//        System.out.println("MD5(" + sourceStr + ",16) = " + result);
         return result;
     }
 

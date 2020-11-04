@@ -20,17 +20,27 @@ public class SysController {
     @Autowired
     private IWeixinService weixinService;
 
-    @GetMapping("admin-login")
-    public String sysLogin(Model model, HttpServletRequest request){
-        String sessionId = request.getParameter("sessionId");
-        model.addAttribute( "sessionId", sessionId);
+    @RequestMapping("/")
+    public String root() {
+        return "redirect:/pages/admin-index";
+    }
+
+    @RequestMapping("/admin-login")
+    public String adminLogin(Model model, HttpServletRequest request) {
+//        String token = MD5Utils.strTo16(System.currentTimeMillis() + UUID.randomUUID().toString());
+//        model.addAttribute( "token", token);
+        model.addAttribute( "token", request.getSession().getId());
         return "admin-login";
+    }
+
+    @RequestMapping("/admin-register")
+    public String adminRegister() {
+        return "admin-register";
     }
 
     @GetMapping("wechat-login")
     public String weChatLogin(Model model, HttpServletRequest request){
 //        String token = MD5Utils.strTo16(System.currentTimeMillis() + UUID.randomUUID().toString());
-
         model.addAttribute( "token", request.getSession().getId());
         return "wechat-login";
     }
@@ -45,39 +55,9 @@ public class SysController {
         return "mobile-auth";
     }
 
-//    @GetMapping("admin-404")
-//    public String sys404(){
-//        return "pages/admin-404";
-//    }
-
-//    @RequestMapping("/admin-404")
-//    public ModelAndView index(HttpServletRequest request) {
-//        ModelAndView modelAndView = new ModelAndView("pages/index");
-//
-//        String page = request.getParameter("page");
-//        String content = request.getParameter("content");
-//        // 不带参数请求
-//        if (page == null || page.equals("") || content == null || content.equals("")) {
-//            page = "test";
-//            content = "test-content";
-//        }
-//        modelAndView.addObject("page", "pages/admin-404");
-//        modelAndView.addObject("content", "admin-404");
-//        return modelAndView;
-//    }
-
-    @GetMapping("admin-500")
-    public String sys500(){
-        return "pages/admin-500";
+    @RequestMapping("/documentation")
+    public String documentation() {
+        return "pages/documentation";
     }
 
-    @GetMapping("admin-blank")
-    public String sysBlank(){
-        return "pages/admin-blank";
-    }
-
-    @GetMapping("admin-index")
-    public String index(){
-        return "pages/admin-index";
-    }
 }
